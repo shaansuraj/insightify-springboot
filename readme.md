@@ -1,6 +1,6 @@
-# NewsApp Backend
+# Insightify Springboot Backend
 
-This is the backend service for the **NewsApp** application, built using **Spring Boot**. It provides endpoints to fetch news articles based on categories from an external news API and serves them to the frontend.
+This is the backend service for the **Insightify** application, built using **Spring Boot**. It provides endpoints to fetch news articles based on categories from an external news API and serves them to the frontend.
 
 ## Features
 
