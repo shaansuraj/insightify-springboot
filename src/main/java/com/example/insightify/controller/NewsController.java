@@ -5,8 +5,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +17,8 @@ import com.example.insightify.model.Article;
 import com.example.insightify.service.NewsService;
 
 @RestController
-@CrossOrigin(origins = "*")
+@RequestMapping("/news")
+@CrossOrigin(origins = "http://localhost:3000")
 public class NewsController {
 
     private static final Logger logger = LoggerFactory.getLogger(NewsController.class);
@@ -22,11 +26,24 @@ public class NewsController {
     @Autowired
     private NewsService newsService;
 
-    @GetMapping("/news")
-    public List<Article> getNews(@RequestParam String category) {
-        logger.info("Received category: {}", category);  // Log the received category
+    /**
+     * CHANGED:
+     * Previously, we had @GetMapping("/{category}") with a @PathVariable.
+     * Now we use @GetMapping (no path) + @RequestParam("category") to match /news?category=XYZ.
+     */
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<Article>> getNewsByQueryParam(@RequestParam String category) {
+        logger.info("Received category query param: {}", category);
         List<Article> articles = newsService.getNewsByCategory(category);
-        logger.info("Fetched {} articles for category: {}", articles.size(), category);  // Log the number of articles fetched
-        return articles;
+        logger.info("Fetched {} articles for category: {}", articles.size(), category);
+        return ResponseEntity.ok(articles);
     }
+
+    /**
+     * REMOVED or COMMENTED OUT:
+     * Old approach with path variable:
+     *   @GetMapping("/{category}")
+     *   public ResponseEntity<List<Article>> getNewsByCategory(@PathVariable String category) { ... }
+     */
 }

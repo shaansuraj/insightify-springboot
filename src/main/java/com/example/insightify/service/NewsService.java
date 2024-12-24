@@ -28,6 +28,7 @@ public class NewsService {
 
     public List<Article> getNewsByCategory(String category) {
         // Corrected URL to NewsAPI
+        //url = https://newsapi.org/v2/top-headlines?country=us&category=sports&apiKey=xyz
         String url = String.format("%s/top-headlines?country=us&category=%s&apiKey=%s", baseUrl, category, apiKey);
         
         // Log the constructed URL for debugging
