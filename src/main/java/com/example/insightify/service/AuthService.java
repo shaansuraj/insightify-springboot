@@ -1,40 +1,44 @@
-// src/main/java/com/example/insightify/service/AuthService.java
-
 package com.example.insightify.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired; // For dependency injection
+import org.springframework.stereotype.Service; // Marks the class as a service layer component
 
-import com.example.insightify.model.User;
-import com.example.insightify.repository.UserRepository;
-import com.example.insightify.security.JwtTokenProvider;
+import com.example.insightify.model.User; // User model class
+import com.example.insightify.repository.UserRepository; // User repository for DB interaction
+import com.example.insightify.security.JwtTokenProvider; // JWT utility for generating tokens
 
-@Service
+@Service // Marks the class as a service to be managed by Spring
 public class AuthService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // Injecting the UserRepository to interact with the database
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider jwtTokenProvider; // Injecting JwtTokenProvider to generate JWT tokens
 
+    // Register a new user in the system
     public String register(User user) {
-        // Save user, etc.
+        // Save the user in the database
         userRepository.save(user);
-        return "User registered successfully!";
+        return "User registered successfully!"; // Return success message
     }
 
+    // Handle login and return a JWT token if credentials are valid
     public String login(User user) {
+        // Find the user by email
         User existingUser = userRepository.findByEmail(user.getEmail());
+
+        // Check if user exists and password matches
         if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            // The user is legit. Now embed "ROLE_USER" and userId in the token
-            Long userId = existingUser.getId(); // or however you get the user ID
+            // User is valid, generate JWT token with role and user ID
+            Long userId = existingUser.getId(); // Get the user ID from the database
             return jwtTokenProvider.generateToken(
-                existingUser.getEmail(),
-                "ROLE_USER",      // single role
-                userId            // store their DB ID
+                existingUser.getEmail(), // Pass the email as the username
+                "ROLE_USER",      // Assign the role "ROLE_USER"
+                userId            // Include the user ID in the token's payload
             );
         } else {
+            // If credentials are invalid, throw an exception
             throw new RuntimeException("Invalid credentials!");
         }
     }
